@@ -1,0 +1,19 @@
+[package]
+name = "loose-semver"
+version = "1.0.0"
+edition = "2024"
+authors = ["Ringo Hoffmann <contact@zekro.de>"]
+categories = ["data-structures"]
+description = "Loose parser for Semantic Versioning"
+license = "MIT"
+documentation = "https://docs.rs/loose-semver"
+repository = "https://github.com/zekrotja/loose-semver"
+
+[features]
+default = ["std"]
+std = []
+
+[dependencies]
+anyhow = "1.0.98"
+nom = "8.0.0"
+serde = { version = "1.0.219", optional = true, default-features = false }
