@@ -6,9 +6,9 @@ use std::str::FromStr;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum VersionState {
-    Alpha(usize),
-    Beta(usize),
-    ReleaseCandidate(usize),
+    Alpha(String),
+    Beta(String),
+    ReleaseCandidate(String),
     Release,
 }
 
@@ -32,11 +32,11 @@ impl fmt::Display for VersionState {
 /// Definitions of version parts.
 ///
 /// ```txt
-/// 1.2.34rc5
-/// | | | |___ Pre
-/// | | |_____ Patch
-/// | |_______ Minor
-/// |_________ Major
+/// 1.2.34(-)rc(.)5
+/// | | |    |___ Pre
+/// | | |________ Patch
+/// | |__________ Minor
+/// |____________ Major
 /// ```
 #[allow(unused)]
 pub enum VersionPart {
@@ -302,7 +302,25 @@ mod test {
             Version::from_str("1rc1").unwrap(),
             Version {
                 major: 1,
-                pre: Some(VersionState::ReleaseCandidate(1)),
+                pre: Some(VersionState::ReleaseCandidate("1".into())),
+                ..Default::default()
+            }
+        );
+
+        assert_eq!(
+            Version::from_str("1-rc1").unwrap(),
+            Version {
+                major: 1,
+                pre: Some(VersionState::ReleaseCandidate("1".into())),
+                ..Default::default()
+            }
+        );
+
+        assert_eq!(
+            Version::from_str("1-rc.1").unwrap(),
+            Version {
+                major: 1,
+                pre: Some(VersionState::ReleaseCandidate("1".into())),
                 ..Default::default()
             }
         );
@@ -312,18 +330,58 @@ mod test {
             Version {
                 major: 1,
                 minor: Some(2),
-                pre: Some(VersionState::Beta(34)),
+                pre: Some(VersionState::Beta("34".into())),
                 ..Default::default()
             }
         );
 
         assert_eq!(
-            Version::from_str("1.2.345alpha678").unwrap(),
+            Version::from_str("1.2-beta34").unwrap(),
+            Version {
+                major: 1,
+                minor: Some(2),
+                pre: Some(VersionState::Beta("34".into())),
+                ..Default::default()
+            }
+        );
+
+        assert_eq!(
+            Version::from_str("1.2-beta.3.4").unwrap(),
+            Version {
+                major: 1,
+                minor: Some(2),
+                pre: Some(VersionState::Beta("3.4".into())),
+                ..Default::default()
+            }
+        );
+
+        assert_eq!(
+            Version::from_str("1.2.345alpha6.7.8").unwrap(),
             Version {
                 major: 1,
                 minor: Some(2),
                 patch: Some(345),
-                pre: Some(VersionState::Alpha(678))
+                pre: Some(VersionState::Alpha("6.7.8".into()))
+            }
+        );
+
+        assert_eq!(
+            Version::from_str("1.2.345-alpha6.7.8").unwrap(),
+            Version {
+                major: 1,
+                minor: Some(2),
+                patch: Some(345),
+                pre: Some(VersionState::Alpha("6.7.8".into()))
+            }
+        );
+
+        assert_eq!(
+            Version::from_str("1.2.345-alpha.6.7.8").unwrap(),
+            Version {
+                major: 1,
+                minor: Some(2),
+                patch: Some(345),
+                pre: Some(VersionState::Alpha("6.7.8".into()))
             }
         );
     }

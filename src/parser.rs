@@ -2,7 +2,7 @@ use super::{Version, VersionState};
 use anyhow::Result;
 use nom::bytes::complete::*;
 use nom::character::complete::char;
-use nom::combinator::map_res;
+use nom::combinator::{map_res, opt};
 use nom::error::{Error, ErrorKind};
 use nom::{IResult, Parser};
 
@@ -21,15 +21,21 @@ fn delim(s: &str) -> IResult<&str, char> {
     char('.')(s)
 }
 
+fn suffix_version(s: &str) -> IResult<&str, &str> {
+    let (s, _) = opt(char('.')).parse(s)?;
+    take_while(|c: char| c.is_ascii()).parse(s)
+}
+
 fn suffix(s: &str) -> IResult<&str, VersionState> {
+    let (s, _) = opt(char('-')).parse(s)?;
     if let Ok((s, _)) = prefix("alpha", s) {
-        return number(s).map(|(s, v)| (s, VersionState::Alpha(v)));
+        return suffix_version(s).map(|(s, v)| (s, VersionState::Alpha(v.into())));
     };
     if let Ok((s, _)) = prefix("beta", s) {
-        return number(s).map(|(s, v)| (s, VersionState::Beta(v)));
+        return suffix_version(s).map(|(s, v)| (s, VersionState::Beta(v.into())));
     };
     if let Ok((s, _)) = prefix("rc", s) {
-        return number(s).map(|(s, v)| (s, VersionState::ReleaseCandidate(v)));
+        return suffix_version(s).map(|(s, v)| (s, VersionState::ReleaseCandidate(v.into())));
     };
     Err(nom::Err::Failure(nom::error::Error {
         input: s,
