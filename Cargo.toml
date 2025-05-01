@@ -8,6 +8,7 @@ description = "Loose parser for Semantic Versioning"
 license = "MIT"
 documentation = "https://docs.rs/loose-semver"
 repository = "https://github.com/zekrotja/loose-semver"
+readme = "README.md"
 
 [features]
 default = ["std"]
