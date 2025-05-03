@@ -1,6 +1,6 @@
 [package]
 name = "loose-semver"
-version = "1.0.0"
+version = "1.1.0"
 edition = "2024"
 authors = ["Ringo Hoffmann <contact@zekro.de>"]
 categories = ["data-structures"]
@@ -11,8 +11,8 @@ repository = "https://github.com/zekrotja/loose-semver"
 readme = "README.md"
 
 [features]
-default = ["std"]
-std = []
+default = []
+serde-nofail = ["serde"]
 
 [dependencies]
 anyhow = "1.0.98"

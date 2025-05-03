@@ -30,6 +30,10 @@ impl<'de> Deserialize<'de> for Version {
             where
                 E: Error,
             {
+                #[cfg(feature = "serde-nofail")]
+                return Ok(string.parse().unwrap_or_default());
+
+                #[cfg(not(feature = "serde-nofail"))]
                 string.parse().map_err(Error::custom)
             }
         }
